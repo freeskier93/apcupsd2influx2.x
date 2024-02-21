@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Run Exporter",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/apcupsd-to-influxdb2.py",
+				"console": "integratedTerminal",
+				"envFile": "${workspaceFolder}/dev.env"
+			}
+		]
+	}
+}

@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  apcupsd2influx2.x:
+    image: freeskier93/apcupsd2influx2.x
+    container_name: apcupsd2influx2.x
+    restart: always
+    environment:
+      - APCUPSD_HOST: 127.0.0.1             # Hostname/IP where APCUPSD is running
+      - APCUPSD_PORT: 3551                  # Port that APCUPSD is listening on
+      - APCUPSD_POLL_RATE: 5                # Rate to poll data from UPS (seconds)
+      - APCUPSD_NOMINAL_POWER: 0            # Nominal power rating of your UPS, required if your UPS does not report NOMPOWER value (watts)
+      - INFLUXDB_HOST: 127.0.0.1            # Hostname/IP where InfluxDB is running
+      - INFLUXDB_PORT: 8086                 # Port InfluxDB is listening on
+      - INFLUXDB_TOKEN:                     # InfluxDB token, this is required
+      - INFLUXDB_BUCKET: apcupsd            # Name of the bucket data will be saved to
+      - INFLUXDB_MEASUREMENT: ups_telemetry # Name of the measurement data will be save to in the bucket
+      - INFLUXDB_ORG: homelab               # Optional organization name
+      - DEBUG: false                        # Enable/Disable Debug logging (true/false)
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+
