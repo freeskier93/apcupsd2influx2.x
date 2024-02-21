@@ -12,7 +12,7 @@
 				"name": "Run Exporter",
 				"type": "debugpy",
 				"request": "launch",
-				"program": "${workspaceFolder}/apcupsd-to-influxdb2.py",
+				"program": "${workspaceFolder}/apcupsd-to-influx2.py",
 				"console": "integratedTerminal",
 				"envFile": "${workspaceFolder}/dev.env"
 			}
