@@ -10,7 +10,7 @@ This container also fixes issues with future datatype conflicts because datatype
 | -------------------- | ------------- | ----------- |
 | APCUPSD_HOST | 127.0.0.1 | Hostname/IP where APCUPSD is running |
 | APCUPSD_PORT | 3551 | Port that APCUPSD is listening on |
-| APCUPSD_POLL_RATE | 5 | Rate to poll data from UPS (seconds) WARNING: Poll rate affects how energy (kWh) and costs are calculated |
+| APCUPSD_POLL_RATE | 5 | Rate to poll data from UPS (seconds) WARNING: Poll rate may affect how energy consumption (kWh) and costs are calculated, see section below regarding poll rate |
 | APCUPSD_NOMINAL_POWER | 0 | Nominal power rating of your UPS, required if your UPS does not report NOMPOWER value (watts) |
 | INFLUXDB_HOST | 127.0.0.1 | Hostname/IP where InfluxDB is running |
 | INFLUXDB_PORT | 8086 | Port InfluxDB is listening on |
@@ -40,4 +40,9 @@ InfluxDB 2.x supports the older InfluxQL language for querying data, this is the
 
 The default measurement name is "ups_telemetry". Some of the existing Grafana dashboards,such as [Unraid UPS Dashboard v2.0 TR](https://grafana.com/grafana/dashboards/10615-unraid-ups-dashboard-v2-0-tr/), expect a different measurement name when performing the queries. Set the INFLUXDB_MEASUREMENT variable to match whatever the dashboard expects.
 
-The rate rate at which data is polled from the UPS affects how total energy (kWh) and cost is calculated. If you adjust APCUPSD_POLL_RATE you must also update any Grafana dashboards to use the correct value when calculating energy and cost.
+### Data Poll Rate and Energy Consumption
+The rate at which data is polled from the UPS may affect how some Grafana dashboards calculate energy consumption (kWh), which also affects costs. Some dashboards calculate energy consumption by adding all the power values in a time range togehter, then dividing by the measurment time interval. This only works if the time interval they are dividing by actually matches the rate at which data is polled from APCUPSD. If these values don't match, calucalated power consumption will be incorrect. 
+
+The better way to calculate power consumption is by integrating the power measurements, because then exact time intervals between each data point will be used. In Grafana this is a simple as changing the sum() function to integral() function, then dividing by 3600 to convert from Watt-seconds to Watt-hours.
+
+TODO: Have this script calculate energy consumption and provide it as a field value called ENERGY. Then you only need to sum these values over a time range to get energy consumption. This could also lead in to calculating cost, including more complicated cost for Time of Use (TOU). Where the user provides some kind of config file with kWh costs for given time ranges.
