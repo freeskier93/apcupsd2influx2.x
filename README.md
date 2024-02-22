@@ -2,7 +2,7 @@
 
 Docker image that will collect UPS telemetry data and export it to InfluxDB 2.x (NOT compatible with InfluxDB 1.x). UPS data is collected from [APCUPSD](http://www.apcupsd.org/) using the [apcaccess](https://pypi.org/project/apcaccess/) Python library.
 
-This container also fixes issues with future datatype conflicts because datatypes are strictly defined. In particular, trying to infer UPS serial number datatype can cause serious issues with InfluxDB since you can't delete/modify fields. Some UPSs may be all numbers the data is converted to an integer/float, while other UPSs may have letters so they get converted to strings. If this happens (say when changing UPSs) it will cause errors when writing the data to Influx.
+This script also prevents issues with future datatype conflicts because datatypes are strictly defined. In particular, trying to infer UPS serial number datatype can cause issues when channging UPSs. Some UPSs may use all numbers where some may have numbers and letters. In the case of all numbers it would be identified as a float, but if it has letteres it would be identified as a string. If you change UPSs and go from float to string this will cause errors when writing the data to the Influx database due to datatybe mismatch.
 
 ## TODO
 - [ ] Perform energy consumption calculation and provide it as a field called ENERGY
