@@ -31,11 +31,7 @@ If you do not already have an InfluxDB token use the following steps to create o
 
 ### Run Docker Container
 ```bash
-docker run --rm  -d --name="apcupsd2influx2.x" \
-    -e "APCUPSD_HOST=192.168.1.10" \
-    -e "INFLUXDB_HOST=192.168.1.10" \
-    -e "INFLUXDB_TOKEN=<token>" \
-    -t freeskier93/apcupsd2influx2.x
+docker run --rm -d --name="apcupsd2influx2.x" -e "APCUPSD_HOST=192.168.1.10" -e "INFLUXDB_HOST=192.168.1.10" -e "INFLUXDB_TOKEN=<token>" ghcr.io/freeskier93/apcupsd2influx2.x:latest
 ```
 Note: If your UPS does not include the NOMPOWER point, you will need to include the APCUPSD_NOMINAL_POWER environment variable in order to calculate the power consumption. If you do not define this value, and your UPS does not send the value, then it will default to 0 and calculated power will be 0.
 
