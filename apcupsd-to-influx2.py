@@ -108,6 +108,9 @@ if __name__ == "__main__":
             logger.error(f"Could not connect to APCUPSD host because connection was refused: {apcupsd_host}")
             time.sleep(apcupsd_poll_rate)
             continue
+        except Exception as e:
+            logger.error(f"Couldn't get data from UPS")
+            logger.exception(e)
 
         # Generate fields dictionary and tags dictionary
         fields_dict = {}
@@ -125,9 +128,9 @@ if __name__ == "__main__":
         # Set nominal power from ups data, if nominal power is not sent then it defaults to the user specified value
         apcupsd_nominal_power = fields_dict.get("NOMPOWER", apcupsd_nominal_power)
 
-        # If user did not specificy nominal power either then print error
+        # If user did not specificy nominal power either then print warning
         if apcupsd_nominal_power == 0:
-            logger.error("Your UPS does not send NOMPOWER value, you must set APCUPSD_NOMINAL_POWER in the template")
+            logger.warning("Your UPS does not send NOMPOWER value, you must set APCUPSD_NOMINAL_POWER in the template to get valid power data")
 
         fields_dict["WATTS"] = int(apcupsd_nominal_power * fields_dict.get("LOADPCT", 0) * 0.01)
 
