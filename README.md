@@ -4,6 +4,11 @@ Docker image that will collect UPS telemetry data and export it to InfluxDB 2.x 
 
 This container also fixes issues with future datatype conflicts because datatypes are strictly defined. In particular, trying to infer UPS serial number datatype can cause serious issues with InfluxDB since you can't delete/modify fields. Some UPSs may be all numbers the data is converted to an integer/float, while other UPSs may have letters so they get converted to strings. If this happens (say when changing UPSs) it will cause errors when writing the data to Influx.
 
+## TODO
+- [ ] Perform energy consumption calculation and provide it as a field called ENERGY
+- [ ] Allow user to give cost per kWh and calculate costs, then provide that as a field called COST
+- [ ] Allow user to provide a config file that defines cost per kWh for various time ranges that way costs can be calculated for Time of Use
+
 ## Environment Variables
 
 | Environment Variable | Default Value | Description |
@@ -44,5 +49,3 @@ The default measurement name is "ups_telemetry". Some of the existing Grafana da
 The rate at which data is polled from the UPS may affect how some Grafana dashboards calculate energy consumption (kWh), which also affects costs. Some dashboards calculate energy consumption by adding all the power values in a time range togehter, then dividing by the measurment time interval. This only works if the time interval they are dividing by actually matches the rate at which data is polled from APCUPSD. If these values don't match, calucalated power consumption will be incorrect. 
 
 The better way to calculate power consumption is by integrating the power measurements, because then exact time intervals between each data point will be used. In Grafana this is a simple as changing the sum() function to integral() function, then dividing by 3600 to convert from Watt-seconds to Watt-hours.
-
-TODO: Have this script calculate energy consumption and provide it as a field value called ENERGY. Then you only need to sum these values over a time range to get energy consumption. This could also lead in to calculating cost, including more complicated cost for Time of Use (TOU). Where the user provides some kind of config file with kWh costs for given time ranges.
