@@ -24,8 +24,12 @@ if __name__ == "__main__":
     apcupsd_host = str(os.getenv("APCUPSD_HOST"))
     apcupsd_port = int(os.getenv("APCUPSD_PORT", 3551))
     apcupsd_poll_rate = int(os.getenv("APCUPSD_POLL_RATE", 5))
-    apcupsd_nominal_power = int(os.getenv("APCUPSD_NOMINAL_POWER", 0))
-
+    
+    # Handle empty input from UnRaid template
+    apcupsd_nominal_power = os.getenv("APCUPSD_NOMINAL_POWER", 0)
+    if apcupsd_nominal_power == "":
+        apcupsd_nominal_power = 0
+    
     influx_host = str(os.getenv("INFLUXDB_HOST"))
     influx_port = int(os.getenv("INFLUXDB_PORT", 8086))
     influx_token = str(os.getenv("INFLUXDB_TOKEN"))
