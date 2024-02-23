@@ -16,7 +16,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 logger = logging.getLogger(__name__)
 logger.setLevel(level="INFO")
 stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(logging.Formatter('%(name)s - %(levelname)s - %(message)s'))
+stream_handler.setFormatter(logging.Formatter("%(name)s - %(levelname)s - %(message)s"))
 logger.addHandler(stream_handler)
 
 if __name__ == "__main__":
@@ -24,12 +24,21 @@ if __name__ == "__main__":
     apcupsd_host = str(os.getenv("APCUPSD_HOST"))
     apcupsd_port = int(os.getenv("APCUPSD_PORT", 3551))
     apcupsd_poll_rate = int(os.getenv("APCUPSD_POLL_RATE", 5))
-    
-    # Handle empty input from UnRaid template
+
+    # Handle empty nominal input from UnRaid template
     apcupsd_nominal_power = os.getenv("APCUPSD_NOMINAL_POWER", 0)
     if apcupsd_nominal_power == "":
         apcupsd_nominal_power = 0
-    
+    else:
+        apcupsd_nominal_power = int(apcupsd_nominal_power)
+
+    # Handle empty cost per kwh input from UnRaid template
+    cost_per_kwh = os.getenv("COST_PER_KWH", 0)
+    if cost_per_kwh == "":
+        cost_per_kwh = 0
+    else:
+        cost_per_kwh = float(cost_per_kwh)
+
     influx_host = str(os.getenv("INFLUXDB_HOST"))
     influx_port = int(os.getenv("INFLUXDB_PORT", 8086))
     influx_token = str(os.getenv("INFLUXDB_TOKEN"))
@@ -72,14 +81,18 @@ if __name__ == "__main__":
         # and the write API can be created for writing to the database
         if not influx_client:
             try:
-                influx_client = InfluxDBClient(url=influx_url, token=influx_token, org=influx_org)
+                influx_client = InfluxDBClient(
+                    url=influx_url, token=influx_token, org=influx_org
+                )
             except Exception as e:
                 logger.error("Could not create InfluxDB client")
                 logger.exception(e)
 
             logger.info("Pinging InfluxDB...")
             if not influx_client.ping():
-                logger.error(f"Could not connect to InfluxDB at {influx_url}. Resetting client and trying again.")
+                logger.error(
+                    f"Could not connect to InfluxDB at {influx_url}. Resetting client and trying again."
+                )
                 influx_client = None
                 time.sleep(apcupsd_poll_rate)
                 continue
@@ -102,14 +115,20 @@ if __name__ == "__main__":
         # Get ups telemetry data
         try:
             logger.debug("Getting data from APCUPSD...")
-            ups_tlm = apc.parse(apc.get(host=apcupsd_host, port=apcupsd_port), strip_units=True)
+            ups_tlm = apc.parse(
+                apc.get(host=apcupsd_host, port=apcupsd_port), strip_units=True
+            )
             logger.debug(f"Got data from APCUPSD:\n{pprint.pformat(ups_tlm)}")
         except TimeoutError as e:
-            logger.error(f"Could not connect to APCUPSD host due to timeout: {apcupsd_host}")
+            logger.error(
+                f"Could not connect to APCUPSD host due to timeout: {apcupsd_host}"
+            )
             time.sleep(apcupsd_poll_rate)
             continue
         except ConnectionRefusedError as e:
-            logger.error(f"Could not connect to APCUPSD host because connection was refused: {apcupsd_host}")
+            logger.error(
+                f"Could not connect to APCUPSD host because connection was refused: {apcupsd_host}"
+            )
             time.sleep(apcupsd_poll_rate)
             continue
         except Exception as e:
@@ -134,13 +153,20 @@ if __name__ == "__main__":
 
         # If user did not specificy nominal power either then print warning
         if apcupsd_nominal_power == 0:
-            logger.warning("Your UPS does not send NOMPOWER value, you must set APCUPSD_NOMINAL_POWER in the template to get valid power data")
+            logger.warning(
+                "Your UPS does not send NOMPOWER value, you must set APCUPSD_NOMINAL_POWER in the template to get valid power data"
+            )
 
         # Calculated power (watts)
-        fields_dict["POWER"] = int(apcupsd_nominal_power * fields_dict.get("LOADPCT", 0) * 0.01)
+        fields_dict["POWER"] = int(
+            apcupsd_nominal_power * fields_dict.get("LOADPCT", 0) * 0.01
+        )
 
         # Calculate energy (kWh)
         fields_dict["ENERGY"] = fields_dict["POWER"] * apcupsd_poll_rate / 3600 / 1000
+
+        # Calculate cost
+        fields_dict["COST"] = fields_dict["ENERGY"] * cost_per_kwh
 
         logger.debug(f"Tags dictionary:\n{pprint.pformat(tags_dict)}")
         logger.debug(f"Fields dictionary:\n{pprint.pformat(fields_dict)}")

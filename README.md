@@ -6,7 +6,7 @@ This script also prevents issues with future datatype conflicts because datatype
 
 ## TODO
 - [x] Perform energy consumption calculation and provide it as a field called ENERGY
-- [ ] Allow user to give cost per kWh and calculate costs, then provide that as a field called COST
+- [x] Allow user to give cost per kWh and calculate costs, then provide that as a field called COST
 - [ ] Allow user to provide a config file that defines cost per kWh for various time ranges that way costs can be calculated for Time of Use
 
 ## Environment Variables
@@ -32,6 +32,7 @@ The following data points are derived from the APCUPSD data and available for us
 | ------------- | ----------- |
 | POWER | Calculated power draw in watts |
 | ENERGY | Calculated energy consumption in kWh |
+| COST | Calculated cost per kWh |
 
 ## How to Use
 
