@@ -54,4 +54,4 @@ InfluxDB 2.x supports the older InfluxQL language for querying data, this is the
 ### Data Poll Rate and Energy Consumption
 The rate at which data is polled from the UPS may affect how some Grafana dashboards calculate energy consumption (kWh), which also affects costs. Some dashboards calculate energy consumption by adding all the power values in a time range togehter, then dividing by the measurment time interval. This only works if the time interval they are dividing by actually matches the rate at which data is polled from APCUPSD. If these values don't match, calucalated power consumption will be incorrect. 
 
-The better way to calculate power consumption is by integrating the power measurements, because then exact time intervals between each data point will be used. In Grafana this is a simple as changing the sum() function to integral() function, then dividing by 3600 to convert from Watt-seconds to Watt-hours.
+This script provides the calculated energy for each time interval, so all you need to do in Grafana is sum the ENERGY field to get total energy for a given time period.
