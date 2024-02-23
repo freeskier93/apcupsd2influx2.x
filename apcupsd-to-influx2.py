@@ -132,7 +132,11 @@ if __name__ == "__main__":
         if apcupsd_nominal_power == 0:
             logger.warning("Your UPS does not send NOMPOWER value, you must set APCUPSD_NOMINAL_POWER in the template to get valid power data")
 
-        fields_dict["WATTS"] = int(apcupsd_nominal_power * fields_dict.get("LOADPCT", 0) * 0.01)
+        # Calculated power (watts)
+        fields_dict["POWER"] = int(apcupsd_nominal_power * fields_dict.get("LOADPCT", 0) * 0.01)
+
+        # Calculate energy (kWh)
+        fields_dict["ENERGY"] = fields_dict["POWER"] * apcupsd_poll_rate / 3600 / 1000
 
         logger.debug(f"Tags dictionary:\n{pprint.pformat(tags_dict)}")
         logger.debug(f"Fields dictionary:\n{pprint.pformat(fields_dict)}")
