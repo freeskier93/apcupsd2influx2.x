@@ -5,7 +5,7 @@ Docker image that will collect UPS telemetry data and export it to InfluxDB 2.x 
 This script also prevents issues with future datatype conflicts because datatypes are strictly defined. In particular, trying to infer UPS serial number datatype can cause issues when channging UPSs. Some UPSs may use all numbers where some may have numbers and letters. In the case of all numbers it would be identified as a float, but if it has letteres it would be identified as a string. If you change UPSs and go from float to string this will cause errors when writing the data to Influx due to datatype mismatch.
 
 ## TODO
-- [ ] Perform energy consumption calculation and provide it as a field called ENERGY
+- [x] Perform energy consumption calculation and provide it as a field called ENERGY
 - [ ] Allow user to give cost per kWh and calculate costs, then provide that as a field called COST
 - [ ] Allow user to provide a config file that defines cost per kWh for various time ranges that way costs can be calculated for Time of Use
 
