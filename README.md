@@ -29,6 +29,7 @@ This script also prevents issues with future datatype conflicts because datatype
 The following data points are derived from the APCUPSD data and available for use
 
 | Variable Name | Description |
+| ------------- | ----------- |
 | POWER | Calculated power draw in watts |
 | ENERGY | Calculated energy consumption in kWh |
 
